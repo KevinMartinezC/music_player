@@ -62,7 +62,9 @@ class DetailActivity : AppCompatActivity() {
         previousButton = binding.previousButton
         nextButton = binding.nextButton
     }
+
     private fun setupButtonClickListeners() {
+        playPauseButton.setOnClickListener { onPlayPauseButtonClick() }
         previousButton.setOnClickListener { onPreviousButtonClick() }
         nextButton.setOnClickListener { onNextButtonClick() }
     }
@@ -95,14 +97,17 @@ class DetailActivity : AppCompatActivity() {
             handler.postDelayed(updateSeekBar, 1000)
         }
     }
+
     private fun onPreviousButtonClick() {
         if (currentSongIndex > 0) {
             currentSongIndex -= 1
-        }else{
+        } else {
             currentSongIndex = mainActivity.songs.size - 1
         }
         playSong()
+        updateSongInfo()
     }
+
     private fun onNextButtonClick() {
         if (currentSongIndex < mainActivity.songs.size - 1) {
             currentSongIndex += 1
@@ -110,7 +115,30 @@ class DetailActivity : AppCompatActivity() {
             currentSongIndex = 0
         }
         playSong()
+        updateSongInfo()
     }
+    private fun onPlayPauseButtonClick() {
+        MediaPlayerHolder.mediaPlayer?.let { mediaPlayer ->
+            if (mediaPlayer.isPlaying) {
+                mediaPlayer.pause()
+                playPauseButton.setImageResource(android.R.drawable.ic_media_play)
+                handler.removeCallbacks(updateSeekBar)
+            } else {
+                mediaPlayer.start()
+                playPauseButton.setImageResource(android.R.drawable.ic_media_pause)
+                handler.postDelayed(updateSeekBar, 1000)
+            }
+        }
+    }
+
+    private fun updateSongInfo() {
+        val songTitles = mainActivity.songs.map { it.title }
+        val albumArts = mainActivity.songs.map { it.albumArt }
+
+        songTitleTextView.text = songTitles[currentSongIndex]
+        albumArtImageView.setImageResource(albumArts[currentSongIndex])
+    }
+
 
     /**
      * Sets up the SeekBar change listener, which handles user interactions with the SeekBar.
