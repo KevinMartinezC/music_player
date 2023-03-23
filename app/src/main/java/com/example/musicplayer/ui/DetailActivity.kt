@@ -30,6 +30,7 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
 
     private val handler = Handler(Looper.getMainLooper())
+
     /**
      * The 'updateSeekBar' runnable is responsible for periodically updating the progress of the SeekBar
      * using the 'handler', ensuring that the updates are performed on the main thread.
@@ -42,6 +43,7 @@ class DetailActivity : AppCompatActivity() {
             }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
@@ -49,7 +51,9 @@ class DetailActivity : AppCompatActivity() {
         initViews()
         initSongInfo()
         setupSeekBarChangeListener()
+        setupButtonClickListeners()
     }
+
     private fun initViews() {
         songTitleTextView = binding.songTitleTextView
         albumArtImageView = binding.albumArtImageView
@@ -58,6 +62,11 @@ class DetailActivity : AppCompatActivity() {
         previousButton = binding.previousButton
         nextButton = binding.nextButton
     }
+    private fun setupButtonClickListeners() {
+        previousButton.setOnClickListener { onPreviousButtonClick() }
+        nextButton.setOnClickListener { onNextButtonClick() }
+    }
+
     private fun initSongInfo() {
         val extras = intent.extras
         val songTitle = extras?.getString(SONG_TITLE_KEY_INTENT) ?: ""
@@ -69,6 +78,7 @@ class DetailActivity : AppCompatActivity() {
         )
         playSong()
     }
+
     private fun playSong() {
         MediaPlayerHolder.mediaPlayer?.let { mediaPlayer ->
             if (mediaPlayer.isPlaying) {
@@ -85,6 +95,22 @@ class DetailActivity : AppCompatActivity() {
             handler.postDelayed(updateSeekBar, 1000)
         }
     }
+    private fun onPreviousButtonClick() {
+        if (currentSongIndex > 0) {
+            currentSongIndex -= 1
+        }else{
+            currentSongIndex = mainActivity.songs.size - 1
+        }
+        playSong()
+    }
+    private fun onNextButtonClick() {
+        if (currentSongIndex < mainActivity.songs.size - 1) {
+            currentSongIndex += 1
+        } else {
+            currentSongIndex = 0
+        }
+        playSong()
+    }
 
     /**
      * Sets up the SeekBar change listener, which handles user interactions with the SeekBar.
@@ -97,10 +123,12 @@ class DetailActivity : AppCompatActivity() {
                     MediaPlayerHolder.mediaPlayer?.seekTo(progress)
                 }
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
+
     companion object {
         const val SONG_TITLE_KEY_INTENT: String = "songTitle"
         const val BASE_PATH: String = "android.resource://"
