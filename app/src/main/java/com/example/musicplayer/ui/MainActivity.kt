@@ -15,7 +15,7 @@ import com.example.musicplayer.models.media.MediaPlayerHolder
 class MainActivity : AppCompatActivity() {
     private lateinit var listView: ListView
 
-    private val songs = arrayOf(
+    val songs = arrayOf(
         Song(SONG_NAME_ONE, R.raw.song1, R.drawable.album_art_1),
         Song(SONG_NAME_TWO, R.raw.song2, R.drawable.album_art_2),
         Song(SONG_NAME_THREE, R.raw.song3, R.drawable.album_art_3)
