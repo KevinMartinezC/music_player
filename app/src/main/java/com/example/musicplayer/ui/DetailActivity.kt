@@ -30,6 +30,10 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
 
     private val handler = Handler(Looper.getMainLooper())
+    /**
+     * The 'updateSeekBar' runnable is responsible for periodically updating the progress of the SeekBar
+     * using the 'handler', ensuring that the updates are performed on the main thread.
+     */
     private val updateSeekBar = object : Runnable {
         override fun run() {
             MediaPlayerHolder.mediaPlayer?.let { mediaPlayer ->
@@ -44,6 +48,7 @@ class DetailActivity : AppCompatActivity() {
 
         initViews()
         initSongInfo()
+        setupSeekBarChangeListener()
     }
     private fun initViews() {
         songTitleTextView = binding.songTitleTextView
@@ -79,6 +84,22 @@ class DetailActivity : AppCompatActivity() {
             seekBar.max = mediaPlayer.duration
             handler.postDelayed(updateSeekBar, 1000)
         }
+    }
+
+    /**
+     * Sets up the SeekBar change listener, which handles user interactions with the SeekBar.
+     * When the user changes the SeekBar's progress, it updates the MediaPlayer's playback position accordingly.
+     */
+    private fun setupSeekBarChangeListener() {
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    MediaPlayerHolder.mediaPlayer?.seekTo(progress)
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
     }
     companion object {
         const val SONG_TITLE_KEY_INTENT: String = "songTitle"
