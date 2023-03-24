@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.databinding.DataBindingUtil
 import com.example.musicplayer.R
 import com.example.musicplayer.databinding.ActivityDetailBinding
@@ -22,8 +23,9 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var playPauseButton: ImageButton
     private lateinit var previousButton: ImageButton
     private lateinit var nextButton: ImageButton
-    private var currentSongIndex: Int = 0
 
+    private var currentSongIndex: Int = 0
+    private var playbackPositionBeforeTransition: Int = 0
 
     private val mainActivity = MainActivity()
 
@@ -43,7 +45,6 @@ class DetailActivity : AppCompatActivity() {
             }
         }
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
@@ -52,6 +53,8 @@ class DetailActivity : AppCompatActivity() {
         initSongInfo()
         setupSeekBarChangeListener()
         setupButtonClickListeners()
+        setupMotionLayoutTransitionListener()
+
     }
 
     private fun initViews() {
@@ -80,7 +83,6 @@ class DetailActivity : AppCompatActivity() {
         )
         playSong()
     }
-
     private fun playSong() {
         MediaPlayerHolder.mediaPlayer?.let { mediaPlayer ->
             if (mediaPlayer.isPlaying) {
@@ -95,6 +97,9 @@ class DetailActivity : AppCompatActivity() {
             mediaPlayer.start()
             seekBar.max = mediaPlayer.duration
             handler.postDelayed(updateSeekBar, 1000)
+
+            playPauseButton.setImageResource(android.R.drawable.ic_media_pause)
+
         }
     }
 
@@ -130,7 +135,6 @@ class DetailActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun updateSongInfo() {
         val songTitles = mainActivity.songs.map { it.title }
         val albumArts = mainActivity.songs.map { it.albumArt }
@@ -138,7 +142,6 @@ class DetailActivity : AppCompatActivity() {
         songTitleTextView.text = songTitles[currentSongIndex]
         albumArtImageView.setImageResource(albumArts[currentSongIndex])
     }
-
 
     /**
      * Sets up the SeekBar change listener, which handles user interactions with the SeekBar.
@@ -154,6 +157,51 @@ class DetailActivity : AppCompatActivity() {
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+    }
+
+    private fun setupMotionLayoutTransitionListener() {
+        val motionLayout = binding.motionLayout
+        motionLayout.setTransitionListener(object : MotionLayout.TransitionListener {
+            override fun onTransitionStarted(
+                motionLayout: MotionLayout?,
+                startId: Int,
+                endId: Int
+            ) {
+            }
+            override fun onTransitionChange(
+                motionLayout: MotionLayout?,
+                startId: Int,
+                endId: Int,
+                progress: Float
+            ) {
+            }
+            override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+                MediaPlayerHolder.mediaPlayer?.let { mediaPlayer ->
+                    // Store the current position before stopping the MediaPlayer
+                    playbackPositionBeforeTransition = mediaPlayer.currentPosition
+                    mediaPlayer.stop()
+                    mediaPlayer.reset()
+
+                    val songUri =
+                        Uri.parse("${BASE_PATH}${packageName}/${mainActivity.songs[currentSongIndex].resource}")
+                    mediaPlayer.setDataSource(this@DetailActivity, songUri)
+                    mediaPlayer.prepare()
+                    // Seek to the position before the transition
+                    mediaPlayer.seekTo(playbackPositionBeforeTransition)
+                    mediaPlayer.start()
+                    seekBar.max = mediaPlayer.duration
+                    handler.postDelayed(updateSeekBar, 1000)
+                }
+            }
+
+            override fun onTransitionTrigger(
+                motionLayout: MotionLayout?,
+                triggerId: Int,
+                positive: Boolean,
+                progress: Float
+            ) {
+            }
         })
     }
 
