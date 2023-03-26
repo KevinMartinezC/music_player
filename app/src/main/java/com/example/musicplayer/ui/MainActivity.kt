@@ -14,6 +14,10 @@ import com.example.musicplayer.models.media.MediaPlayerHolder
 
 class MainActivity : AppCompatActivity() {
     private lateinit var listView: ListView
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("currentSongIndex", currentSongIndex)
+    }
 
     val songs = arrayOf(
         Song(SONG_NAME_ONE, R.raw.song1, R.drawable.album_art_1),
@@ -30,6 +34,9 @@ class MainActivity : AppCompatActivity() {
         initViews()
         setupListView()
 
+        if (savedInstanceState != null) {
+            currentSongIndex = savedInstanceState.getInt("currentSongIndex")
+        }
     }
 
     private fun initViews() {

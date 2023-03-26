@@ -16,6 +16,12 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var detailActivityController: DetailActivityController
     private val mainActivity = MainActivity()
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("currentSongIndex", detailActivityController.currentSongIndex)
+        outState.putInt("playbackPosition", MediaPlayerHolder.mediaPlayer?.currentPosition ?: 0)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
@@ -29,6 +35,13 @@ class DetailActivity : AppCompatActivity() {
         detailActivityController.setupSeekBarChangeListener()
         detailActivityController.setupButtonClickListeners()
         detailActivityController.setupMotionLayoutTransitionListener()
+
+        if (savedInstanceState != null) {
+            detailActivityController.currentSongIndex =
+                savedInstanceState.getInt("currentSongIndex")
+            detailActivityController.playbackPositionBeforeTransition =
+                savedInstanceState.getInt("playbackPosition")
+        }
     }
 
     override fun onDestroy() {
