@@ -18,8 +18,8 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("currentSongIndex", detailActivityController.currentSongIndex)
-        outState.putInt("playbackPosition", MediaPlayerHolder.mediaPlayer?.currentPosition ?: 0)
+        outState.putInt(CURRENT_SONG_KEY, detailActivityController.currentSongIndex)
+        outState.putInt(PLAYBACK_POSITION_KEY, MediaPlayerHolder.mediaPlayer?.currentPosition ?: 0)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,9 +38,9 @@ class DetailActivity : AppCompatActivity() {
 
         if (savedInstanceState != null) {
             detailActivityController.currentSongIndex =
-                savedInstanceState.getInt("currentSongIndex")
+                savedInstanceState.getInt(CURRENT_SONG_KEY)
             detailActivityController.playbackPositionBeforeTransition =
-                savedInstanceState.getInt("playbackPosition")
+                savedInstanceState.getInt(PLAYBACK_POSITION_KEY)
         }
     }
 
@@ -48,6 +48,11 @@ class DetailActivity : AppCompatActivity() {
         super.onDestroy()
         MediaPlayerHolder.mediaPlayer?.release()
         MediaPlayerHolder.mediaPlayer = null
+    }
+
+    companion object{
+        const val CURRENT_SONG_KEY: String = "currentSongIndex"
+        const val  PLAYBACK_POSITION_KEY: String ="playbackPosition"
     }
 
 
