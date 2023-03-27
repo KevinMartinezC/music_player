@@ -32,7 +32,6 @@ class DetailActivityController(
             }
         }
     }
-
     fun setupButtonClickListeners() {
         view.playPauseButton.setOnClickListener { onPlayPauseButtonClick() }
         view.previousButton.setOnClickListener { onPreviousButtonClick() }
