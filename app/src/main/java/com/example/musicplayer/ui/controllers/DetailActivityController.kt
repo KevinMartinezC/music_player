@@ -16,8 +16,8 @@ class DetailActivityController(
     private val songs: Array<Song>
 
 ) {
-    private var currentSongIndex: Int = 0
-    private var playbackPositionBeforeTransition: Int = 0
+    var currentSongIndex: Int = 0
+    var playbackPositionBeforeTransition: Int = 0
     private val handler = Handler(Looper.getMainLooper())
 
     /**
@@ -32,7 +32,6 @@ class DetailActivityController(
             }
         }
     }
-
     fun setupButtonClickListeners() {
         view.playPauseButton.setOnClickListener { onPlayPauseButtonClick() }
         view.previousButton.setOnClickListener { onPreviousButtonClick() }

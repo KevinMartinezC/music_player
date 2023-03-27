@@ -15,14 +15,15 @@ import com.example.musicplayer.models.media.MediaPlayerHolder
 class MainActivity : AppCompatActivity() {
     private lateinit var listView: ListView
 
+    private var currentSongIndex: Int = 0
+
     val songs = arrayOf(
         Song(SONG_NAME_ONE, R.raw.song1, R.drawable.album_art_1),
         Song(SONG_NAME_TWO, R.raw.song2, R.drawable.album_art_2),
         Song(SONG_NAME_THREE, R.raw.song3, R.drawable.album_art_3)
     )
-    private var currentSongIndex: Int = 0
-
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -30,12 +31,13 @@ class MainActivity : AppCompatActivity() {
         initViews()
         setupListView()
 
+        if (savedInstanceState != null) {
+            currentSongIndex = savedInstanceState.getInt(CURRENT_SONG_KEY)
+        }
     }
-
     private fun initViews() {
         listView = binding.listView
     }
-
     private fun setupListView() {
         val adapter = ArrayAdapter(
             this,
@@ -57,17 +59,20 @@ class MainActivity : AppCompatActivity() {
             MediaPlayer.create(this@MainActivity, songs[position].resource)
         MediaPlayerHolder.mediaPlayer?.start()
     }
-
     private fun navigateToDetailActivity(position: Int) {
         val intent = Intent(this@MainActivity, DetailActivity::class.java)
         intent.putExtra(SONG_TITLE_KEY, songs[position].title)
         startActivity(intent)
     }
-
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(CURRENT_SONG_KEY, currentSongIndex)
+    }
     companion object {
         const val SONG_NAME_ONE: String = "Bar Liar"
         const val SONG_NAME_TWO: String = "Girls Like You"
         const val SONG_NAME_THREE: String = "See You Again"
         const val SONG_TITLE_KEY: String = "songTitle"
+        const val CURRENT_SONG_KEY: String = "currentSongIndex"
     }
 }
